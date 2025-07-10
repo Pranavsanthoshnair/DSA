@@ -1,5 +1,7 @@
+Name - Pranav S Nair
+Date - 10/07/2025
+Purpose - Compact array from Sparse Matrix
 #include <stdio.h>
-
 int main() {
     int sparseMatrix[4][5] = {
         {0, 0, 3, 0, 4},
@@ -7,7 +9,6 @@ int main() {
         {0, 0, 0, 0, 0},
         {0, 2, 6, 0, 0}
     };
-
     int size = 0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 5; j++) {
@@ -16,7 +17,6 @@ int main() {
             }
         }
     }
-
     int compactMatrix[3][size];
     int k = 0;
     for (int i = 0; i < 4; i++) {
@@ -29,14 +29,11 @@ int main() {
             }
         }
     }
-
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < size; j++) {
             printf("%d ", compactMatrix[i][j]);
         }
         printf("\n");
     }
-
     return 0;
 }
-
