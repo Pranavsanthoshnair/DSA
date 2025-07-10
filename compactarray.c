@@ -1,6 +1,8 @@
+/*
 Name - Pranav S Nair
 Date - 10/07/2025
 Purpose - Compact array from Sparse Matrix
+*/
 #include <stdio.h>
 int main() {
     int sparseMatrix[4][5] = {
