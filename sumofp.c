@@ -5,7 +5,7 @@ struct Term {
     int expo;
 };
 
-void addPolynomials(struct Term poly1[], int n1, struct Term poly2[], int n2, struct Term polyResult[], int *nResult) {        // *nResult - used to store the count of the resulting terms
+void addPolynomials(struct Term poly1[], int n1, struct Term poly2[], int n2, struct Term polyResult[], int *nResult) {        // *nResult - used to store the count of the resulting terms,n1 and n2 are number of terms in polynomial,nresult - no of terms in resulting polynomial
     int i = 0, j = 0, k = 0;
 
     while (i < n1 && j < n2) {                                                                                                 // Comparing first polynomial with second polynomial.
@@ -46,14 +46,14 @@ void addPolynomials(struct Term poly1[], int n1, struct Term poly2[], int n2, st
 void displayPolynomial(struct Term poly[], int n) {                                                                            // To Display Polynomial.
     for (int i = 0; i < n; i++) {
         printf("%dx^%d", poly[i].coeff, poly[i].expo);
-        if (i != n - 1) {
+        if (i != n - 1) {                                                                                                      // To Display the + sign between terms.
             printf(" + ");
         }
     }
     printf("\n");
 }
 
-void readPolynomial(struct Term poly[], int *n) {                                                                              // To Read Polynomials
+void readPolynomial(struct Term poly[], int *n) {                                                                              // To Read Polynomials.
     printf("Enter the number of terms in the polynomial: ");
     scanf("%d", n);
 
