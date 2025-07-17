@@ -10,7 +10,7 @@ void addPolynomials(struct Term poly1[], int n1, struct Term poly2[], int n2, st
 
     while (i < n1 && j < n2) {                                                                                                 // Comparing first polynomial with second polynomial.
         
-        if (poly1[i].expo == poly2[j].expo) {                        // Checking equal or not first.
+        if (poly1[i].expo == poly2[j].expo) {                                                                                  // Checking equal or not first.
             polyResult[k].coeff = poly1[i].coeff + poly2[j].coeff;
             polyResult[k].expo = poly1[i].expo;
             i++;
