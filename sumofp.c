@@ -9,6 +9,7 @@ void addPolynomials(struct Term poly1[], int n1, struct Term poly2[], int n2, st
     int i = 0, j = 0, k = 0;
 
     while (i < n1 && j < n2) {                                                                                                 // Comparing first polynomial with second polynomial.
+        
         if (poly1[i].expo == poly2[j].expo) {                        // Checking equal or not first.
             polyResult[k].coeff = poly1[i].coeff + poly2[j].coeff;
             polyResult[k].expo = poly1[i].expo;
@@ -63,7 +64,7 @@ void readPolynomial(struct Term poly[], int *n) {                               
     }
 }
 
-int main() {
+int main() {                                                                                                                  
     struct Term poly1[20], poly2[20], polyResult[40];
     int n1, n2, nResult;
     
