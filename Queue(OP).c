@@ -1,13 +1,13 @@
 #include <stdio.h>
 #define MAX 5
 
-int queue[MAX] = {11, 22, 33};
-int front = 0;   
-int rear = 2;    
+int queue[MAX];
+int front = -1;
+int rear = -1;
 
 void display() {
     if (front == -1) {
-        printf("");
+        printf("Queue is empty\n");
     } else {
         printf("Queue: ");
         for (int i = front; i <= rear; i++) {
@@ -21,7 +21,7 @@ void enqueue(int value) {
     if (rear == MAX - 1) {
         printf("Queue is full (Overflow)\n");
     } else {
-        if (front == -1) {  
+        if (front == -1) {
             front = 0;
         }
         rear++;
@@ -47,20 +47,36 @@ void dequeue() {
 }
 
 int main() {
-    display();
+    int choice, value;
 
-    enqueue(44);
-    enqueue(55);
-    enqueue(66);  
+    while (1) {
+        printf("\nChoose an operation:\n");
+        printf("1. Enqueue\n");
+        printf("2. Dequeue\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
 
-    dequeue();
-    dequeue();
-    dequeue();
-    dequeue();
-    dequeue();
-    dequeue();   
+        switch (choice) {
+            case 1:
+                printf("Enter value to enqueue: ");
+                scanf("%d", &value);
+                enqueue(value);
+                break;
 
-    enqueue(77);
+            case 2:
+                dequeue();
+                break;
+
+            case 3:
+                printf("Exiting program.\n");
+                return 0;
+
+            default:
+                printf("Invalid choice! Try again.\n");
+        }
+    }
 
     return 0;
 }
+
