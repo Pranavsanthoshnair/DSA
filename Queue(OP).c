@@ -7,7 +7,7 @@ int rear = 2;
 
 void display() {
     if (front == -1) {
-        printf("Queue is empty\n");
+        printf("");
     } else {
         printf("Queue: ");
         for (int i = front; i <= rear; i++) {
