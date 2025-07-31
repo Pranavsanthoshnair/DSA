@@ -10,18 +10,6 @@ void enqueue(int value) {
         printf("Queue is full (Overflow)\n");
     } else if (rear == -1) {
         front = 0;
-        rear = 0;#include <stdio.h>
-#define MAX 5
-
-int queue[MAX] = {11, 22, 33};
-int front = 0;
-int rear = 2;
-
-void enqueue(int value) {
-    if (rear == MAX - 1) {
-        printf("Queue is full (Overflow)\n");
-    } else if (rear == -1) {
-        front = 0;
         rear = 0;
         queue[rear] = value;
         printf("%d inserted into the queue\n", value);
