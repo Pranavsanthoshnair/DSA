@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-int rows = 3, cols = 3; // Fixed size matrix
+int rows = 3, cols = 3;
 int matrixA[10][10], matrixB[10][10];
 int compactA[20][3], compactB[20][3], result[40][3], transposeMat[40][3];
 int sizeA, sizeB, sizeR;
@@ -109,7 +109,15 @@ int main() {
 
     int choice;
     while (1) {
-        printf("\n1. Sum A+B\n2. Transpose A\n3. Transpose B\n4. Transpose Result\n5. Exit\nEnter choice: ");
+        printf("\nMenu:\n");
+        printf("1. Sum A + B\n");
+        printf("2. Transpose A\n");
+        printf("3. Transpose B\n");
+        printf("4. Transpose Result\n");
+        printf("5. Exit\n");
+        printf("6. Print Matrix A (Compact Form)\n");
+        printf("7. Print Matrix B (Compact Form)\n");
+        printf("Enter choice: ");
         scanf("%d", &choice);
 
         switch (choice) {
@@ -135,6 +143,14 @@ int main() {
                 break;
             case 5:
                 return 0;
+            case 6:
+                printf("Matrix A (Compact Form):\n");
+                display(compactA, sizeA);
+                break;
+            case 7:
+                printf("Matrix B (Compact Form):\n");
+                display(compactB, sizeB);
+                break;
             default:
                 printf("Invalid choice!\n");
         }
