@@ -5,10 +5,29 @@ int matrixA[6][6], matrixB[6][6];
 int compactA[36][3], compactB[36][3], result[72][3], transposeMat[72][3];
 int sizeA, sizeB, sizeR;
 
-void readMatrix(int mat[6][6]) {
-    for (int i = 0; i < rows; i++)
-        for (int j = 0; j < cols; j++)
-            scanf("%d", &mat[i][j]);
+void initializeMatrix(int mat[6][6]) {
+    for (int i = 0; i < 6; i++)
+        for (int j = 0; j < 6; j++)
+            mat[i][j] = 0;
+}
+
+void readMatrixSparse(int mat[6][6], char matrixName) {
+    int nonZeroCount;
+    printf("Enter number of non-zero elements for Matrix %c: ", matrixName);
+    scanf("%d", &nonZeroCount);
+    
+    printf("Enter non-zero elements (row col value) for Matrix %c:\n", matrixName);
+    for (int i = 0; i < nonZeroCount; i++) {
+        int row, col, value;
+        printf("Element %d: ", i + 1);
+        scanf("%d %d %d", &row, &col, &value);
+        if (row >= 0 && row < rows && col >= 0 && col < cols) {
+            mat[row][col] = value;
+        } else {
+            printf("Invalid position! Skipping element.\n");
+            i--; // Retry this element
+        }
+    }
 }
 
 int createCompact(int mat[6][6], int compact[36][3]) {
@@ -97,16 +116,68 @@ void display(int mat[72][3], int size) {
         printf("%3d %3d %3d\n", mat[i][0], mat[i][1], mat[i][2]);
 }
 
+void displaySparseMatrix(int mat[6][6]) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            printf("%3d ", mat[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void displaySideBySide(int mat[6][6], int compact[36][3], int size, char matrixName) {
+    printf("\nMatrix %c\n", matrixName);
+    printf("Sparse Matrix Form:\tCompact Array Form:\n");
+    
+    int maxRows = (rows > size + 1) ? rows : size + 1;
+    
+    for (int i = 0; i < maxRows; i++) {
+        if (i < rows) {
+            for (int j = 0; j < cols; j++) {
+                printf("%3d ", mat[i][j]);
+            }
+        } else {
+            for (int j = 0; j < cols; j++) {
+                printf("    ");
+            }
+        }
+        
+        printf("\t\t");
+        if (i <= size) {
+            printf("[%2d][%2d][%2d]", compact[i][0], compact[i][1], compact[i][2]);
+        }
+        
+        printf("\n");
+    }
+}
+
+void convertCompactToSparse(int compact[72][3], int mat[6][6]) {
+    for (int i = 0; i < 6; i++)
+        for (int j = 0; j < 6; j++)
+            mat[i][j] = 0;
+    
+    int size = compact[0][2];
+    for (int i = 1; i <= size; i++) {
+        int row = compact[i][0];
+        int col = compact[i][1];
+        int val = compact[i][2];
+        mat[row][col] = val;
+    }
+}
+
 int main() {
     printf("Enter matrix size (3-6): ");
     scanf("%d", &rows);
     cols = rows;
 
-    printf("Enter elements of Matrix A (%dx%d):\n", rows, cols);
-    readMatrix(matrixA);
+    initializeMatrix(matrixA);
+    initializeMatrix(matrixB);
 
-    printf("Enter elements of Matrix B (%dx%d):\n", rows, cols);
-    readMatrix(matrixB);
+    printf("\n--- Input Matrix A ---\n");
+    readMatrixSparse(matrixA, 'A');
+
+    printf("\n--- Input Matrix B ---\n");
+    readMatrixSparse(matrixB, 'B');
 
     sizeA = createCompact(matrixA, compactA);
     sizeB = createCompact(matrixB, compactB);
@@ -118,9 +189,10 @@ int main() {
         printf("2. Transpose A\n");
         printf("3. Transpose B\n");
         printf("4. Transpose Result\n");
-        printf("5. Print Matrix A (Compact Form)\n");
-        printf("6. Print Matrix B (Compact Form)\n");
-        printf("7. Exit\n");
+        printf("5. Display Matrix A (Side by Side)\n");
+        printf("6. Display Matrix B (Side by Side)\n");
+        printf("7. Display Result (Side by Side)\n");
+        printf("8. Exit\n");
         printf("Enter choice: ");
         scanf("%d", &choice);
 
@@ -141,20 +213,31 @@ int main() {
                 display(transposeMat, compactB[0][2]);
                 break;
             case 4:
-                transpose(result, transposeMat);
-                printf("Transpose of Result:\n");
-                display(transposeMat, result[0][2]);
+                if (sizeR > 0) {
+                    transpose(result, transposeMat);
+                    printf("Transpose of Result:\n");
+                    display(transposeMat, result[0][2]);
+                } else {
+                    printf("No result matrix to transpose. Please perform sum operation first.\n");
+                }
                 break;
             case 5:
-                printf("Matrix A (Compact Form):\n");
-                display(compactA, sizeA);
+                displaySideBySide(matrixA, compactA, sizeA, 'A');
                 break;
             case 6:
-                printf("Matrix B (Compact Form):\n");
-                display(compactB, sizeB);
+                displaySideBySide(matrixB, compactB, sizeB, 'B');
                 break;
             case 7:
-                printf("Exiting Program........................");
+                if (sizeR > 0) {
+                    int resultSparse[6][6];
+                    convertCompactToSparse(result, resultSparse);
+                    displaySideBySide(resultSparse, result, sizeR, 'R');
+                } else {
+                    printf("No result matrix to display. Please perform sum operation first.\n");
+                }
+                break;
+            case 8:
+                printf("Exiting Program........................\n");
                 return 0;
             default:
                 printf("Invalid choice!\n");
