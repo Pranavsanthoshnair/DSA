@@ -118,9 +118,9 @@ int main() {
         printf("2. Transpose A\n");
         printf("3. Transpose B\n");
         printf("4. Transpose Result\n");
-        printf("5. Exit\n");
-        printf("6. Print Matrix A (Compact Form)\n");
-        printf("7. Print Matrix B (Compact Form)\n");
+        printf("5. Print Matrix A (Compact Form)\n");
+        printf("6. Print Matrix B (Compact Form)\n");
+        printf("7. Exit\n");
         printf("Enter choice: ");
         scanf("%d", &choice);
 
@@ -146,15 +146,16 @@ int main() {
                 display(transposeMat, result[0][2]);
                 break;
             case 5:
-                return 0;
-            case 6:
                 printf("Matrix A (Compact Form):\n");
                 display(compactA, sizeA);
                 break;
-            case 7:
+            case 6:
                 printf("Matrix B (Compact Form):\n");
                 display(compactB, sizeB);
                 break;
+            case 7:
+                printf("Exiting Program........................");
+                return 0;
             default:
                 printf("Invalid choice!\n");
         }
