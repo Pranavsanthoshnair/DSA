@@ -1,17 +1,17 @@
 #include <stdio.h>
 
-int rows = 3, cols = 3;
-int matrixA[10][10], matrixB[10][10];
-int compactA[20][3], compactB[20][3], result[40][3], transposeMat[40][3];
+int rows, cols;
+int matrixA[6][6], matrixB[6][6];
+int compactA[36][3], compactB[36][3], result[72][3], transposeMat[72][3];
 int sizeA, sizeB, sizeR;
 
-void readMatrix(int mat[10][10]) {
+void readMatrix(int mat[6][6]) {
     for (int i = 0; i < rows; i++)
         for (int j = 0; j < cols; j++)
             scanf("%d", &mat[i][j]);
 }
 
-int createCompact(int mat[10][10], int compact[20][3]) {
+int createCompact(int mat[6][6], int compact[36][3]) {
     int k = 1;
     compact[0][0] = rows;
     compact[0][1] = cols;
@@ -75,7 +75,7 @@ int sumCompact() {
     return k - 1;
 }
 
-void transpose(int src[40][3], int trans[40][3]) {
+void transpose(int src[72][3], int trans[72][3]) {
     trans[0][0] = src[0][1];
     trans[0][1] = src[0][0];
     trans[0][2] = src[0][2];
@@ -91,13 +91,17 @@ void transpose(int src[40][3], int trans[40][3]) {
             }
 }
 
-void display(int mat[40][3], int size) {
+void display(int mat[72][3], int size) {
     printf("Row Col Val\n");
     for (int i = 0; i <= size; i++)
         printf("%3d %3d %3d\n", mat[i][0], mat[i][1], mat[i][2]);
 }
 
 int main() {
+    printf("Enter matrix size (3-6): ");
+    scanf("%d", &rows);
+    cols = rows;
+
     printf("Enter elements of Matrix A (%dx%d):\n", rows, cols);
     readMatrix(matrixA);
 
