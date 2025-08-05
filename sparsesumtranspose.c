@@ -6,13 +6,16 @@ int sizeA, sizeB, sizeR;
 
 void readMatrixSparse(int mat[10][10], char name) {
     int count, row, col, value;
-    printf("Enter non-zero elements for Matrix %c: ", name);
+    printf("How many non-zero elements for Matrix %c: ", name);
     scanf("%d", &count);
+    printf("Enter %d non-zero elements (row col value):\n", count);
     for (int i = 0; i < count; i++) {
+        printf("Element %d: ", i + 1);
         scanf("%d %d %d", &row, &col, &value);
         if (row >= 0 && row < rows && col >= 0 && col < cols)
             mat[row][col] = value;
     }
+    // Fill remaining positions with 0 (already initialized)
 }
 
 int createCompact(int mat[10][10], int compact[100][3]) {
@@ -101,46 +104,45 @@ int main() {
     printf("Enter matrix size (1-10): ");
     scanf("%d", &rows);
     cols = rows;
-    
     for (int i = 0; i < 10; i++)
         for (int j = 0; j < 10; j++)
             matrixA[i][j] = matrixB[i][j] = 0;
-
     readMatrixSparse(matrixA, 'A');
     readMatrixSparse(matrixB, 'B');
     sizeA = createCompact(matrixA, compactA);
     sizeB = createCompact(matrixB, compactB);
-
     int choice;
     while (1) {
-        printf("\n1.Sum 2.Transpose 3.Show A 4.Show B 5.Show Result 6.Exit\nChoice: ");
+        printf("\n1.Sum 2.Transpose 3.Show A 4.Show B 5.Exit\nChoice: ");
         scanf("%d", &choice);
-        
         if (choice == 1) {
             sizeR = sumCompact();
-            printf("Sum Result:\n");
-            display(result, sizeR);
+            printf("Sum Result (Sparse Matrix Form):\n");
+            // Convert result compact form back to sparse matrix and print it
+            int sumSparse[10][10] = {0};
+            convertToSparse(result, sumSparse);
+            // Display sumSparse matrix (sparse matrix form)
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++)
+                    printf("%3d ", sumSparse[i][j]);
+                printf("\n");
+            }
         }
-        if (choice == 2) {
+        else if (choice == 2) {
             if (sizeR > 0) {
                 transpose(result, transposeMat);
                 printf("Transpose of Result:\n");
                 display(transposeMat, result[0][2]);
             } else printf("No result to transpose.\n");
         }
-        if (choice == 3) displayMatrix(matrixA, compactA, sizeA, 'A');
-        if (choice == 4) displayMatrix(matrixB, compactB, sizeB, 'B');
-        if (choice == 5) {
-            if (sizeR > 0) {
-                int resultSparse[10][10];
-                convertToSparse(result, resultSparse);
-                displayMatrix(resultSparse, result, sizeR, 'R');
-            } else printf("No result to display.\n");
-        }
-        if (choice == 6) {
+        else if (choice == 3) displayMatrix(matrixA, compactA, sizeA, 'A');
+        else if (choice == 4) displayMatrix(matrixB, compactB, sizeB, 'B');
+        else if (choice == 5) {
             printf("Exiting...\n");
             return 0;
         }
-        if (choice < 1 || choice > 6) printf("Invalid choice!\n");
+        else {
+            printf("Invalid choice!\n");
+        }
     }
 }
