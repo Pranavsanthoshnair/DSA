@@ -1,148 +1,93 @@
 #include <stdio.h>
-
-int rows, cols, matrixA[10][10], matrixB[10][10];
-int compactA[100][3], compactB[100][3], result[200][3], transposeMat[200][3];
+typedef struct { int row, col, val; } Triplet;
+int rows, cols, A[10][10] = {0}, B[10][10] = {0};
+Triplet cA[100], cB[100], result[200], transposeR[200];
 int sizeA, sizeB, sizeR;
 
-void readMatrixSparse(int mat[10][10], char name) {
-    int count, row, col, value;
+void inputMatrix(int M[10][10], char name) {
+    int n, r, c, v;
     printf("How many non-zero elements for Matrix %c: ", name);
-    scanf("%d", &count);
-    printf("Enter %d non-zero elements (row col value):\n", count);
-    for (int i = 0; i < count; i++) {
+    scanf("%d", &n);
+    printf("Enter %d non-zero elements (row col value):\n", n);
+    for (int i = 0; i < n; i++) {
         printf("Element %d: ", i + 1);
-        scanf("%d %d %d", &row, &col, &value);
-        if (row >= 0 && row < rows && col >= 0 && col < cols)
-            mat[row][col] = value;
+        scanf("%d %d %d", &r, &c, &v);
+        if (r >= 0 && r < rows && c >= 0 && c < cols) M[r][c] = v;
     }
-    // Fill remaining positions with 0 (already initialized)
 }
 
-int createCompact(int mat[10][10], int compact[100][3]) {
+int toCompact(int M[10][10], Triplet C[100]) {
     int k = 1;
-    compact[0][0] = rows; compact[0][1] = cols;
+    C[0] = (Triplet){rows, cols, 0};
     for (int i = 0; i < rows; i++)
         for (int j = 0; j < cols; j++)
-            if (mat[i][j] != 0) {
-                compact[k][0] = i; compact[k][1] = j; compact[k][2] = mat[i][j];
-                k++;
-            }
-    compact[0][2] = k - 1;
-    return k - 1;
+            if (M[i][j]) C[k++] = (Triplet){i, j, M[i][j]};
+    return C[0].val = k - 1;
 }
 
-int sumCompact() {
+int addCompact() {
     int i = 1, j = 1, k = 1;
-    result[0][0] = rows; result[0][1] = cols;
+    result[0] = (Triplet){rows, cols, 0};
     while (i <= sizeA && j <= sizeB) {
-        if (compactA[i][0] < compactB[j][0] || (compactA[i][0] == compactB[j][0] && compactA[i][1] < compactB[j][1])) {
-            result[k][0] = compactA[i][0]; result[k][1] = compactA[i][1]; result[k][2] = compactA[i][2];
-            i++;
-        } else if (compactB[j][0] < compactA[i][0] || (compactB[j][0] == compactA[i][0] && compactB[j][1] < compactA[i][1])) {
-            result[k][0] = compactB[j][0]; result[k][1] = compactB[j][1]; result[k][2] = compactB[j][2];
-            j++;
-        } else {
-            result[k][0] = compactA[i][0]; result[k][1] = compactA[i][1]; result[k][2] = compactA[i][2] + compactB[j][2];
-            i++; j++;
-        }
-        k++;
+        if (cA[i].row < cB[j].row || (cA[i].row == cB[j].row && cA[i].col < cB[j].col)) result[k++] = cA[i++];
+        else if (cB[j].row < cA[i].row || (cB[j].row == cA[i].row && cB[j].col < cA[i].col)) result[k++] = cB[j++];
+        else result[k++] = (Triplet){cA[i].row, cA[i].col, cA[i++].val + cB[j++].val};
     }
-    while (i <= sizeA) {
-        result[k][0] = compactA[i][0]; result[k][1] = compactA[i][1]; result[k][2] = compactA[i][2];
-        i++; k++;
-    }
-    while (j <= sizeB) {
-        result[k][0] = compactB[j][0]; result[k][1] = compactB[j][1]; result[k][2] = compactB[j][2];
-        j++; k++;
-    }
-    result[0][2] = k - 1;
-    return k - 1;
+    while (i <= sizeA) result[k++] = cA[i++];
+    while (j <= sizeB) result[k++] = cB[j++];
+    return result[0].val = k - 1;
 }
 
-void transpose(int src[200][3], int trans[200][3]) {
-    trans[0][0] = src[0][1]; trans[0][1] = src[0][0]; trans[0][2] = src[0][2];
+void toSparse(Triplet C[200], int M[10][10]) {
+    for (int i = 0; i < rows; i++)
+        for (int j = 0; j < cols; j++) M[i][j] = 0;
+    for (int i = 1; i <= C[0].val; i++) M[C[i].row][C[i].col] = C[i].val;
+}
+
+void transpose(Triplet S[200], Triplet T[200]) {
+    T[0] = (Triplet){S[0].col, S[0].row, S[0].val};
     int k = 1;
     for (int i = 0; i < cols; i++)
-        for (int j = 1; j <= src[0][2]; j++)
-            if (src[j][1] == i) {
-                trans[k][0] = src[j][1]; trans[k][1] = src[j][0]; trans[k][2] = src[j][2];
-                k++;
-            }
+        for (int j = 1; j <= S[0].val; j++)
+            if (S[j].col == i) T[k++] = (Triplet){S[j].col, S[j].row, S[j].val};
 }
 
-void display(int mat[200][3], int size) {
+void showCompact(Triplet C[200], int size) {
     printf("Row Col Val\n");
-    for (int i = 0; i <= size; i++)
-        printf("%3d %3d %3d\n", mat[i][0], mat[i][1], mat[i][2]);
+    for (int i = 0; i <= size; i++) printf("%3d %3d %3d\n", C[i].row, C[i].col, C[i].val);
 }
 
-void displayMatrix(int mat[10][10], int compact[100][3], int size, char name) {
+void showMatrix(int M[10][10], Triplet C[100], int size, char name) {
     printf("\nMatrix %c - Sparse Form:\t\tCompact Form:\n", name);
-    int maxRows = (rows > size + 1) ? rows : size + 1;
-    for (int i = 0; i < maxRows; i++) {
-        if (i < rows) {
-            for (int j = 0; j < cols; j++) printf("%3d ", mat[i][j]);
-        } else {
-            for (int j = 0; j < cols; j++) printf("    ");
-        }
+    for (int i = 0; i < (rows > size + 1 ? rows : size + 1); i++) {
+        if (i < rows) for (int j = 0; j < cols; j++) printf("%3d ", M[i][j]);
+        else for (int j = 0; j < cols; j++) printf("    ");
         printf("\t\t");
-        if (i <= size) printf("[%2d][%2d][%2d]", compact[i][0], compact[i][1], compact[i][2]);
+        if (i <= size) printf("[%2d][%2d][%2d]", C[i].row, C[i].col, C[i].val);
         printf("\n");
     }
 }
 
-void convertToSparse(int compact[200][3], int mat[10][10]) {
-    for (int i = 0; i < 10; i++)
-        for (int j = 0; j < 10; j++)
-            mat[i][j] = 0;
-    int size = compact[0][2];
-    for (int i = 1; i <= size; i++)
-        mat[compact[i][0]][compact[i][1]] = compact[i][2];
-}
-
 int main() {
-    printf("Enter matrix size (1-10): ");
-    scanf("%d", &rows);
-    cols = rows;
-    for (int i = 0; i < 10; i++)
-        for (int j = 0; j < 10; j++)
-            matrixA[i][j] = matrixB[i][j] = 0;
-    readMatrixSparse(matrixA, 'A');
-    readMatrixSparse(matrixB, 'B');
-    sizeA = createCompact(matrixA, compactA);
-    sizeB = createCompact(matrixB, compactB);
+    printf("Enter matrix size (1-10): "); scanf("%d", &rows); cols = rows;
+    inputMatrix(A, 'A'); inputMatrix(B, 'B');
+    sizeA = toCompact(A, cA); sizeB = toCompact(B, cB);
     int choice;
     while (1) {
-        printf("\n1.Sum 2.Transpose 3.Show A 4.Show B 5.Exit\nChoice: ");
-        scanf("%d", &choice);
+        printf("\n1.Sum 2.Transpose 3.Show A 4.Show B 5.Exit\nChoice: "); scanf("%d", &choice);
         if (choice == 1) {
-            sizeR = sumCompact();
+            sizeR = addCompact(); int sum[10][10]; toSparse(result, sum);
             printf("Sum Result (Sparse Matrix Form):\n");
-            // Convert result compact form back to sparse matrix and print it
-            int sumSparse[10][10] = {0};
-            convertToSparse(result, sumSparse);
-            // Display sumSparse matrix (sparse matrix form)
             for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < cols; j++)
-                    printf("%3d ", sumSparse[i][j]);
+                for (int j = 0; j < cols; j++) printf("%3d ", sum[i][j]);
                 printf("\n");
             }
-        }
-        else if (choice == 2) {
-            if (sizeR > 0) {
-                transpose(result, transposeMat);
-                printf("Transpose of Result:\n");
-                display(transposeMat, result[0][2]);
-            } else printf("No result to transpose.\n");
-        }
-        else if (choice == 3) displayMatrix(matrixA, compactA, sizeA, 'A');
-        else if (choice == 4) displayMatrix(matrixB, compactB, sizeB, 'B');
-        else if (choice == 5) {
-            printf("Exiting...\n");
-            return 0;
-        }
-        else {
-            printf("Invalid choice!\n");
-        }
+        } else if (choice == 2) {
+            if (result[0].val > 0) { transpose(result, transposeR); printf("Transpose of Result:\n"); showCompact(transposeR, transposeR[0].val); }
+            else printf("No result to transpose.\n");
+        } else if (choice == 3) showMatrix(A, cA, sizeA, 'A');
+        else if (choice == 4) showMatrix(B, cB, sizeB, 'B');
+        else if (choice == 5) { printf("Exiting...\n"); return 0; }
+        else printf("Invalid choice!\n");
     }
 }
