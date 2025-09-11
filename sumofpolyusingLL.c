@@ -64,9 +64,41 @@ void printPoly(struct Term* poly) {
 }
 
 // Add two polynomials (stub for now)
+// Add two polynomials
 struct Term* addPoly(struct Term* poly1, struct Term* poly2) {
-    // Not implemented in your code, leaving blank
-    return NULL;
+    struct Term* result = NULL;
+
+    while (poly1 != NULL && poly2 != NULL) {
+        if (poly1->expo == poly2->expo) {
+            int sumCoeff = poly1->coeff + poly2->coeff;
+            if (sumCoeff != 0) {  // avoid zero terms
+                result = insertNode(result, sumCoeff, poly1->expo);
+            }
+            poly1 = poly1->next;
+            poly2 = poly2->next;
+        }
+        else if (poly1->expo > poly2->expo) {
+            result = insertNode(result, poly1->coeff, poly1->expo);
+            poly1 = poly1->next;
+        }
+        else { // poly2->expo > poly1->expo
+            result = insertNode(result, poly2->coeff, poly2->expo);
+            poly2 = poly2->next;
+        }
+    }
+
+    // Copy remaining terms
+    while (poly1 != NULL) {
+        result = insertNode(result, poly1->coeff, poly1->expo);
+        poly1 = poly1->next;
+    }
+
+    while (poly2 != NULL) {
+        result = insertNode(result, poly2->coeff, poly2->expo);
+        poly2 = poly2->next;
+    }
+
+    return result;
 }
 
 int main() {
@@ -89,7 +121,7 @@ int main() {
     printf("Polynomial 2: ");
     printPoly(poly2);
 
-    printf("Result (not implemented): ");
+    printf("Result : ");
     printPoly(result);
 
     return 0;
