@@ -1,22 +1,18 @@
 #include <stdio.h>
-
-int deque[100];  // Maximum possible size
+int deque[100];
 int front = -1, rear = -1, MAX;
-
 int isFull() {
     return ((front == 0 && rear == MAX - 1) || (front == rear + 1));
 }
-
 int isEmpty() {
     return (front == -1);
 }
-
 void insertFront(int val) {
     if (isFull()) {
         printf("Deque Full!\n");
         return;
     }
-    if (front == -1) {  // First element
+    if (front == -1) { 
         front = rear = 0;
     } else if (front == 0) {
         front = MAX - 1;
@@ -25,13 +21,12 @@ void insertFront(int val) {
     }
     deque[front] = val;
 }
-
 void insertRear(int val) {
     if (isFull()) {
         printf("Deque Full!\n");
         return;
     }
-    if (rear == -1) {  // First element
+    if (rear == -1) { 
         front = rear = 0;
     } else if (rear == MAX - 1) {
         rear = 0;
@@ -40,7 +35,6 @@ void insertRear(int val) {
     }
     deque[rear] = val;
 }
-
 void deleteFront() {
     if (isEmpty()) {
         printf("Deque Empty!\n");
@@ -48,7 +42,6 @@ void deleteFront() {
     }
     int deletedVal = deque[front];
     printf("Deleted %d from Front\n", deletedVal);
-
     if (front == rear) {
         front = rear = -1;
     } else if (front == MAX - 1) {
@@ -57,7 +50,6 @@ void deleteFront() {
         front++;
     }
 }
-
 void deleteRear() {
     if (isEmpty()) {
         printf("Deque Empty!\n");
@@ -74,7 +66,6 @@ void deleteRear() {
         rear--;
     }
 }
-
 void display() {
     if (isEmpty()) {
         printf("Deque Empty!\n");
@@ -89,7 +80,6 @@ void display() {
     }
     printf("\n");
 }
-
 int main() {
     int choice, val;
     printf("Enter size of deque (max 100): ");
