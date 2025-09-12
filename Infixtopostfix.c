@@ -1,35 +1,48 @@
 #include <stdio.h>
-#include <ctype.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <math.h>
+
 #define MAX 100
+
 char stack[MAX];
 int top = -1;
+
 void push(char c) {
     stack[++top] = c;
 }
+
+
 char pop() {
     return stack[top--];
 }
-int intStack[MAX];
-int intTop = -1;
-void pushInt(int val) {
-    intStack[++intTop] = val;
-}
-int popInt() {
-    return intStack[intTop--];
-}
+
+
 int precedence(char op) {
     if (op == '+' || op == '-') return 1;
     if (op == '*' || op == '/') return 2;
+    if (op == '^') return 3; 
     return 0;
 }
+
+int isRightAssociative(char op) {
+    return op == '^';
+}
+
+
 void infixToPostfix(char infix[], char postfix[]) {
-    int i, k = 0;
+    int i = 0, k = 0;
     char c;
-    top = -1;  
-    for (i = 0; (c = infix[i]) != '\0'; i++) {
-        if (isalnum(c)) {
-            postfix[k++] = c; 
+    top = -1;
+
+    while ((c = infix[i]) != '\0') {
+        if (isdigit(c) || c == '.') {
+            while (isdigit(infix[i]) || infix[i] == '.') {
+                postfix[k++] = infix[i++];
+            }
+            postfix[k++] = ' '; 
+            continue;
         }
         else if (c == '(') {
             push(c);
@@ -37,53 +50,81 @@ void infixToPostfix(char infix[], char postfix[]) {
         else if (c == ')') {
             while (top != -1 && stack[top] != '(') {
                 postfix[k++] = pop();
+                postfix[k++] = ' ';
             }
             pop(); 
         }
-    else { 
-        while (top != -1 && stack[top] != '(' && precedence(stack[top]) >= precedence(c)) {
-            postfix[k++] = pop();
+        else {
+            while (top != -1 && stack[top] != '(') {
+                char topOp = stack[top];
+                int precTop = precedence(topOp);
+                int precCurr = precedence(c);
+                if (precTop > precCurr || (precTop == precCurr && !isRightAssociative(c))) {
+                    postfix[k++] = pop();
+                    postfix[k++] = ' ';
+                } else {
+                    break;
+                }
+            }
+            push(c);
         }
-        push(c);
-    }
+        i++;
     }
     while (top != -1) {
         postfix[k++] = pop();
+        postfix[k++] = ' ';
     }
     postfix[k] = '\0';
-    printf("Infix : %-20s Postfix : %s\n", infix, postfix);
+    printf("Infix  : %s\n", infix);
+    printf("Postfix: %s\n", postfix);
 }
-int evaluatePostfix(char postfix[]) {
-    char c;
-    int i, op1, op2, result;
-    intTop = -1;
-    for (i = 0; (c = postfix[i]) != '\0'; i++) {
-        if (isdigit(c)) {
-            pushInt(c - '0');
-        }
-        else {
-            op2 = popInt();
-            op1 = popInt();
-            switch (c) {
-                case '+': result = op1 + op2; break;
-                case '-': result = op1 - op2; break;
-                case '*': result = op1 * op2; break;
-                case '/': result = op1 / op2; break;
+float evaluatePostfix(char postfix[]) {
+    float stackf[MAX];
+    int topf = -1;
+
+    char *token = strtok(postfix, " ");
+    while (token != NULL) {
+        if (isdigit(token[0]) || (token[0] == '.' && isdigit(token[1]))) {
+            stackf[++topf] = atof(token);
+        } else {
+          
+            if (topf < 1) {
+                printf("Error: insufficient operands\n");
+                exit(1);
+            }
+            float op2 = stackf[topf--];
+            float op1 = stackf[topf--];
+            switch (token[0]) {
+                case '+': stackf[++topf] = op1 + op2; break;
+                case '-': stackf[++topf] = op1 - op2; break;
+                case '*': stackf[++topf] = op1 * op2; break;
+                case '/': 
+                    if (op2 == 0) {
+                        printf("Error: division by zero\n");
+                        exit(1);
+                    }
+                    stackf[++topf] = op1 / op2; 
+                    break;
+                case '^': stackf[++topf] = powf(op1, op2); break;
                 default:
+                    printf("Unknown operator %c\n", token[0]);
                     exit(1);
             }
-            pushInt(result);
         }
+        token = strtok(NULL, " ");
     }
-    return popInt();
+    if (topf != 0) {
+        printf("Error: invalid expression\n");
+        exit(1);
+    }
+    return stackf[topf];
 }
 int main() {
-    char infix[MAX];
-    char postfix[MAX];
+    char infix[MAX], postfix[3 * MAX];
     printf("Enter infix expression: ");
     scanf("%s", infix);
     infixToPostfix(infix, postfix);
-    int result = evaluatePostfix(postfix);
-    printf("Evaluation Result: %d\n", result);
+    float result = evaluatePostfix(postfix);
+    printf("Evaluation Result: %.6f\n", result);
     return 0;
 }
