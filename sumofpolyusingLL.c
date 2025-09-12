@@ -54,11 +54,10 @@ void printPoly(struct Term* poly) {
 }
 struct Term* addPoly(struct Term* poly1, struct Term* poly2) {
     struct Term* result = NULL;
-
     while (poly1 != NULL && poly2 != NULL) {
         if (poly1->expo == poly2->expo) {
             int sumCoeff = poly1->coeff + poly2->coeff;
-            if (sumCoeff != 0) {  // avoid zero terms
+            if (sumCoeff != 0) {  
                 result = insertNode(result, sumCoeff, poly1->expo);
             }
             poly1 = poly1->next;
@@ -68,7 +67,7 @@ struct Term* addPoly(struct Term* poly1, struct Term* poly2) {
             result = insertNode(result, poly1->coeff, poly1->expo);
             poly1 = poly1->next;
         }
-        else { // poly2->expo > poly1->expo
+        else { 
             result = insertNode(result, poly2->coeff, poly2->expo);
             poly2 = poly2->next;
         }
