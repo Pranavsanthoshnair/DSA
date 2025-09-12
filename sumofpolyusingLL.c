@@ -1,21 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-// Node for each polynomial term
 struct Term {
     int coeff;
     int expo;
     struct Term* next;
 };
-
-// Insert a new term in sorted order (by exponent)
 struct Term* insertNode(struct Term* poly, int coeff, int expo) {
     struct Term* newNode = malloc(sizeof(struct Term));
     newNode->coeff = coeff;
     newNode->expo = expo;
     newNode->next = NULL;
-
-    // Insert at head if empty or higher exponent
     if (poly == NULL || expo > poly->expo) {
         newNode->next = poly;
         poly = newNode;
@@ -30,8 +24,6 @@ struct Term* insertNode(struct Term* poly, int coeff, int expo) {
     }
     return poly;
 }
-
-// Create a polynomial by taking input
 struct Term* createPoly(struct Term* poly) {
     int n, coeff, expo;
     printf("Enter number of terms: ");
@@ -47,8 +39,6 @@ struct Term* createPoly(struct Term* poly) {
     }
     return poly;
 }
-
-// Print polynomial
 void printPoly(struct Term* poly) {
     if (poly == NULL) {
         printf("No polynomial\n");
@@ -62,9 +52,6 @@ void printPoly(struct Term* poly) {
     }
     printf("\n");
 }
-
-// Add two polynomials (stub for now)
-// Add two polynomials
 struct Term* addPoly(struct Term* poly1, struct Term* poly2) {
     struct Term* result = NULL;
 
@@ -86,43 +73,30 @@ struct Term* addPoly(struct Term* poly1, struct Term* poly2) {
             poly2 = poly2->next;
         }
     }
-
-    // Copy remaining terms
     while (poly1 != NULL) {
         result = insertNode(result, poly1->coeff, poly1->expo);
         poly1 = poly1->next;
     }
-
     while (poly2 != NULL) {
         result = insertNode(result, poly2->coeff, poly2->expo);
         poly2 = poly2->next;
     }
-
     return result;
 }
-
 int main() {
     struct Term* poly1 = NULL;
     struct Term* poly2 = NULL;
     struct Term* result = NULL;
-
     printf("Enter first polynomial:\n");
     poly1 = createPoly(poly1);
-
     printf("Enter second polynomial:\n");
     poly2 = createPoly(poly2);
-
-    // addPoly still incomplete
     result = addPoly(poly1, poly2);
-
     printf("Polynomial 1: ");
     printPoly(poly1);
-
     printf("Polynomial 2: ");
     printPoly(poly2);
-
     printf("Result : ");
     printPoly(result);
-
     return 0;
 }
