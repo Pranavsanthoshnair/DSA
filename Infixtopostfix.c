@@ -9,10 +9,18 @@ char stack[MAX];
 int top = -1;
 
 void push(char c) {
+    if (top >= MAX - 1) {
+        printf("Error: Stack overflow\n");
+        exit(1);
+    }
     stack[++top] = c;
 }
 
 char pop() {
+    if (top == -1) {
+        printf("Error: Stack underflow\n");
+        exit(1);
+    }
     return stack[top--];
 }
 
@@ -27,30 +35,63 @@ int isRightAssociative(char op) {
     return op == '^';
 }
 
-void infixToPostfix(char infix[], char postfix[]) {
+int isOperator(char c) {
+    return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
+}
+
+int isVariable(char c) {
+    return isalpha(c);
+}
+
+void infixToPostfix(const char *infix, char *postfix) {
     int i = 0, k = 0;
-    char c;
     top = -1;
 
-    while ((c = infix[i]) != '\0') {
+    while (infix[i] != '\0') {
+        char c = infix[i];
+
+        if (isspace(c)) {
+            i++;
+            continue;
+        }
+
         if (isdigit(c) || c == '.') {
             while (isdigit(infix[i]) || infix[i] == '.') {
                 postfix[k++] = infix[i++];
             }
             postfix[k++] = ' ';
-            continue;
+        }
+        else if (isVariable(c)) {
+            postfix[k++] = c;
+            postfix[k++] = ' ';
+            i++;
         }
         else if (c == '(') {
             push(c);
+            i++;
         }
         else if (c == ')') {
             while (top != -1 && stack[top] != '(') {
                 postfix[k++] = pop();
                 postfix[k++] = ' ';
             }
+            if (top == -1) {
+                printf("Error: Mismatched parentheses\n");
+                exit(1);
+            }
             pop();
+            i++;
         }
-        else {
+        else if (isOperator(c)) {
+            if (c == '-') {
+                if (i == 0 || infix[i-1] == '(' || isOperator(infix[i-1])) {
+                    postfix[k++] = '0';
+                    postfix[k++] = ' ';
+                    push('-');
+                    i++;
+                    continue;
+                }
+            }
             while (top != -1 && stack[top] != '(') {
                 char topOp = stack[top];
                 int precTop = precedence(topOp);
@@ -58,21 +99,28 @@ void infixToPostfix(char infix[], char postfix[]) {
                 if (precTop > precCurr || (precTop == precCurr && !isRightAssociative(c))) {
                     postfix[k++] = pop();
                     postfix[k++] = ' ';
-                } else {
+                }
+                else {
                     break;
                 }
             }
             push(c);
+            i++;
         }
-        i++;
+        else {
+            printf("Error: Invalid character '%c' in expression\n", c);
+            exit(1);
+        }
     }
     while (top != -1) {
+        if (stack[top] == '(' || stack[top] == ')') {
+            printf("Error: Mismatched parentheses\n");
+            exit(1);
+        }
         postfix[k++] = pop();
         postfix[k++] = ' ';
     }
     postfix[k] = '\0';
-    printf("Infix  : %s\n", infix);
-    printf("Postfix: %s\n", postfix);
 }
 
 float power(float base, int exp) {
@@ -87,15 +135,27 @@ float power(float base, int exp) {
     return result;
 }
 
-float evaluatePostfix(char postfix[]) {
+int containsVariable(const char *expr) {
+    for (int i = 0; expr[i]; i++) {
+        if (isVariable(expr[i])) return 1;
+    }
+    return 0;
+}
+
+float evaluatePostfix(const char *postfix) {
     float stackf[MAX];
     int topf = -1;
 
-    char *token = strtok(postfix, " ");
+    char exprCopy[3 * MAX];
+    strcpy(exprCopy, postfix);
+
+    char *token = strtok(exprCopy, " ");
     while (token != NULL) {
-        if (isdigit(token[0]) || (token[0] == '.' && isdigit(token[1]))) {
+        if (isdigit(token[0]) || (token[0] == '.' && isdigit(token[1])) ||
+            (token[0] == '-' && (isdigit(token[1]) || token[1] == '.'))) {
             stackf[++topf] = atof(token);
-        } else {
+        }
+        else if (strlen(token) == 1 && isOperator(token[0])) {
             if (topf < 1) {
                 printf("Error: insufficient operands\n");
                 exit(1);
@@ -126,6 +186,10 @@ float evaluatePostfix(char postfix[]) {
                     exit(1);
             }
         }
+        else {
+            printf("Error: Invalid token '%s'\n", token);
+            exit(1);
+        }
         token = strtok(NULL, " ");
     }
     if (topf != 0) {
@@ -136,11 +200,29 @@ float evaluatePostfix(char postfix[]) {
 }
 
 int main() {
-    char infix[MAX], postfix[3 * MAX];
+    char infix[3 * MAX], postfix[3 * MAX];
+
     printf("Enter infix expression: ");
-    scanf("%s", infix);
+    if (!fgets(infix, sizeof(infix), stdin)) {
+        printf("Error reading input\n");
+        return 1;
+    }
+    size_t len = strlen(infix);
+    if (len > 0 && infix[len - 1] == '\n') {
+        infix[len - 1] = '\0';
+    }
+
     infixToPostfix(infix, postfix);
-    float result = evaluatePostfix(postfix);
-    printf("Evaluation Result: %.6f\n", result);
+
+    printf("Infix  : %s\n", infix);
+    printf("Postfix: %s\n", postfix);
+
+    if (containsVariable(infix)) {
+        printf("Expression contains variables, evaluation skipped.\n");
+    } else {
+        float result = evaluatePostfix(postfix);
+        printf("Evaluation Result: %.6f\n", result);
+    }
+
     return 0;
 }
