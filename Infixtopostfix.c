@@ -12,11 +12,9 @@ char pop() {
 }
 int intStack[MAX];
 int intTop = -1;
-
 void pushInt(int val) {
     intStack[++intTop] = val;
 }
-
 int popInt() {
     return intStack[intTop--];
 }
@@ -28,9 +26,7 @@ int precedence(char op) {
 void infixToPostfix(char infix[], char postfix[]) {
     int i, k = 0;
     char c;
-
     top = -1;  
-
     for (i = 0; (c = infix[i]) != '\0'; i++) {
         if (isalnum(c)) {
             postfix[k++] = c; 
@@ -60,9 +56,7 @@ void infixToPostfix(char infix[], char postfix[]) {
 int evaluatePostfix(char postfix[]) {
     char c;
     int i, op1, op2, result;
-
     intTop = -1;
-
     for (i = 0; (c = postfix[i]) != '\0'; i++) {
         if (isdigit(c)) {
             pushInt(c - '0');
@@ -76,7 +70,6 @@ int evaluatePostfix(char postfix[]) {
                 case '*': result = op1 * op2; break;
                 case '/': result = op1 / op2; break;
                 default:
-                    printf("Invalid operator: %c\n", c);
                     exit(1);
             }
             pushInt(result);
