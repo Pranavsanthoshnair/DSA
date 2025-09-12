@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <math.h>
 
 #define MAX 100
 
@@ -13,23 +12,20 @@ void push(char c) {
     stack[++top] = c;
 }
 
-
 char pop() {
     return stack[top--];
 }
 
-
 int precedence(char op) {
     if (op == '+' || op == '-') return 1;
     if (op == '*' || op == '/') return 2;
-    if (op == '^') return 3; 
+    if (op == '^') return 3;
     return 0;
 }
 
 int isRightAssociative(char op) {
     return op == '^';
 }
-
 
 void infixToPostfix(char infix[], char postfix[]) {
     int i = 0, k = 0;
@@ -41,7 +37,7 @@ void infixToPostfix(char infix[], char postfix[]) {
             while (isdigit(infix[i]) || infix[i] == '.') {
                 postfix[k++] = infix[i++];
             }
-            postfix[k++] = ' '; 
+            postfix[k++] = ' ';
             continue;
         }
         else if (c == '(') {
@@ -52,7 +48,7 @@ void infixToPostfix(char infix[], char postfix[]) {
                 postfix[k++] = pop();
                 postfix[k++] = ' ';
             }
-            pop(); 
+            pop();
         }
         else {
             while (top != -1 && stack[top] != '(') {
@@ -78,6 +74,19 @@ void infixToPostfix(char infix[], char postfix[]) {
     printf("Infix  : %s\n", infix);
     printf("Postfix: %s\n", postfix);
 }
+
+float power(float base, int exp) {
+    float result = 1.0f;
+    int absExp = exp < 0 ? -exp : exp;
+    for (int i = 0; i < absExp; i++) {
+        result *= base;
+    }
+    if (exp < 0) {
+        return 1.0f / result;
+    }
+    return result;
+}
+
 float evaluatePostfix(char postfix[]) {
     float stackf[MAX];
     int topf = -1;
@@ -87,7 +96,6 @@ float evaluatePostfix(char postfix[]) {
         if (isdigit(token[0]) || (token[0] == '.' && isdigit(token[1]))) {
             stackf[++topf] = atof(token);
         } else {
-          
             if (topf < 1) {
                 printf("Error: insufficient operands\n");
                 exit(1);
@@ -98,14 +106,21 @@ float evaluatePostfix(char postfix[]) {
                 case '+': stackf[++topf] = op1 + op2; break;
                 case '-': stackf[++topf] = op1 - op2; break;
                 case '*': stackf[++topf] = op1 * op2; break;
-                case '/': 
+                case '/':
                     if (op2 == 0) {
                         printf("Error: division by zero\n");
                         exit(1);
                     }
-                    stackf[++topf] = op1 / op2; 
+                    stackf[++topf] = op1 / op2;
                     break;
-                case '^': stackf[++topf] = powf(op1, op2); break;
+                case '^':
+                    if ((int)op2 == op2) {
+                        stackf[++topf] = power(op1, (int)op2);
+                    } else {
+                        printf("Error: non-integer exponent not supported\n");
+                        exit(1);
+                    }
+                    break;
                 default:
                     printf("Unknown operator %c\n", token[0]);
                     exit(1);
@@ -119,6 +134,7 @@ float evaluatePostfix(char postfix[]) {
     }
     return stackf[topf];
 }
+
 int main() {
     char infix[MAX], postfix[3 * MAX];
     printf("Enter infix expression: ");
