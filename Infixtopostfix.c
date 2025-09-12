@@ -121,6 +121,7 @@ float evaluatePostfix(const char *postfix) {
 int main() {
     char infix[3 * MAX], postfix[3 * MAX];
 
+    printf("Enter infix expression: ");
     if (!fgets(infix, sizeof(infix), stdin)) return 1;
     size_t len = strlen(infix);
     if (len && infix[len - 1] == '\n') infix[len - 1] = 0;
