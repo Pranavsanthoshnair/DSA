@@ -65,36 +65,20 @@ TreeNode* buildExpressionTree(char* postfix) {
     return nodeStack[top];
 }
 
-void preOrderTraversal(TreeNode* root) {
-    if (root) {
-        printf("%c ", root->data);
-        preOrderTraversal(root->left);
-        preOrderTraversal(root->right);
-    }
-}
+void printTree(TreeNode* root, char* prefix, int isLeft) {
+    if (root == NULL) return;
 
-void postOrderTraversal(TreeNode* root) {
-    if (root) {
-        postOrderTraversal(root->left);
-        postOrderTraversal(root->right);
-        printf("%c ", root->data);
-    }
-}
+    printf("%s", prefix);
+    printf("%s", isLeft ? "├──" : "└──");
+    printf("%c\n", root->data);
 
-void printLevelOrder(TreeNode* root) {
-    if (!root) return;
-    TreeNode* queue[100];
-    int front = 0, rear = 0;
-    queue[rear++] = root;
-    while (front < rear) {
-        int nodeCount = rear - front;
-        for (int i = 0; i < nodeCount; i++) {
-            TreeNode* current = queue[front++];
-            printf("%c ", current->data);
-            if (current->left) queue[rear++] = current->left;
-            if (current->right) queue[rear++] = current->right;
-        }
-        printf("\n");
+    char newPrefix[100];
+    strcpy(newPrefix, prefix);
+    strcat(newPrefix, isLeft ? "│   " : "    ");
+
+    if (root->left || root->right) {
+        printTree(root->left, newPrefix, 1);
+        printTree(root->right, newPrefix, 0);
     }
 }
 
@@ -107,11 +91,8 @@ int main() {
     infixToPostfix(infix, postfix);
     TreeNode* root = buildExpressionTree(postfix);
 
-    printf("\nPrefix Equivalent:   ");
-    preOrderTraversal(root);
-    printf("\nPostfix Equivalent:  ");
-    postOrderTraversal(root);
-    printf("\nLevel Order (Tree):\n");
-    printLevelOrder(root);
+    printf("\nExpression Tree (with branches):\n");
+    printTree(root, "", 0);
+
     return 0;
 }
