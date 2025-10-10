@@ -21,10 +21,13 @@ void infixToPostfix(char* infix, char* postfix) {
     int top = -1, k = 0;
 
     for (int i = 0; infix[i]; i++) {
-        if (isalnum(infix[i])) postfix[k++] = infix[i];
-        else if (infix[i] == '(') opStack[++top] = infix[i];
+        if (isalnum(infix[i])) 
+            postfix[k++] = infix[i];
+        else if (infix[i] == '(') 
+            opStack[++top] = infix[i];
         else if (infix[i] == ')') {
-            while (top != -1 && opStack[top] != '(') postfix[k++] = opStack[top--];
+            while (top != -1 && opStack[top] != '(')
+                postfix[k++] = opStack[top--];
             top--;
         } else {
             while (top != -1 && getPrecedence(infix[i]) <= getPrecedence(opStack[top]))
@@ -33,7 +36,8 @@ void infixToPostfix(char* infix, char* postfix) {
         }
     }
 
-    while (top != -1) postfix[k++] = opStack[top--];
+    while (top != -1)
+        postfix[k++] = opStack[top--];
     postfix[k] = '\0';
 }
 
@@ -82,6 +86,13 @@ void printTree(TreeNode* root, char* prefix, int isLeft) {
     }
 }
 
+void printPrefix(TreeNode* root) {
+    if (root == NULL) return;
+    printf("%c", root->data);
+    printPrefix(root->left);
+    printPrefix(root->right);
+}
+
 int main() {
     char infix[100], postfix[100];
     printf("Enter an infix expression: ");
@@ -91,7 +102,12 @@ int main() {
     infixToPostfix(infix, postfix);
     TreeNode* root = buildExpressionTree(postfix);
 
-    printf("\nExpression Tree (with branches):\n");
+    printf("\nInfix Expression:   %s", infix);
+    printf("\nPostfix Expression: %s", postfix);
+    printf("\nPrefix Expression:  ");
+    printPrefix(root);
+
+    printf("\n\nExpression Tree (with branches):\n");
     printTree(root, "", 0);
 
     return 0;
