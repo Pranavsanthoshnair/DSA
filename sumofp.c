@@ -58,7 +58,7 @@ void readPolynomial(struct Term poly[], int *n) {                               
     printf("Enter the number of terms in the polynomial: ");
     scanf("%d", n);
 
-    for (int i = 0; i < *n; i++) {used to store the count of the resulting terms
+    for (int i = 0; i < *n; i++) {                                                                                            //used to store the count of the resulting terms
         printf("Enter coefficient and exponent for term %d: ", i + 1);
         scanf("%d %d", &poly[i].coeff, &poly[i].expo);
     }
