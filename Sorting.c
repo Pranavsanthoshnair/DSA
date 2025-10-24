@@ -2,6 +2,12 @@
 
 int steps;
 
+void printArray(int arr[], int n) {
+    for (int i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+    printf("\n");
+}
+
 void bubbleSort(int arr[], int n) {
     steps = 0;
     for (int i = 0; i < n - 1; i++) {
@@ -14,6 +20,8 @@ void bubbleSort(int arr[], int n) {
             }
         }
     }
+    printf("\nSorted array using Bubble Sort: ");
+    printArray(arr, n);
 }
 
 void insertionSort(int arr[], int n) {
@@ -29,6 +37,8 @@ void insertionSort(int arr[], int n) {
         arr[j + 1] = key;
         steps++;
     }
+    printf("\nSorted array using Insertion Sort: ");
+    printArray(arr, n);
 }
 
 int partition(int arr[], int low, int high) {
@@ -89,6 +99,7 @@ int main() {
     int n;
     printf("Enter number of elements: ");
     scanf("%d", &n);
+
     int arr[n], temp[n];
     printf("Enter %d elements:\n", n);
     for (int i = 0; i < n; i++) scanf("%d", &arr[i]);
@@ -107,11 +118,15 @@ int main() {
     steps = 0;
     quickSort(temp, 0, n - 1);
     quickSteps = steps;
+    printf("\nSorted array using Quick Sort: ");
+    printArray(temp, n);
 
     copyArray(arr, temp, n);
     steps = 0;
     mergeSort(temp, 0, n - 1);
     mergeSteps = steps;
+    printf("\nSorted array using Merge Sort: ");
+    printArray(temp, n);
 
     printf("\nComparison of Sorting Algorithms:\n");
     printf("Bubble Sort Steps: %d\n", bubbleSteps);
