@@ -1,70 +1,51 @@
 #include <stdio.h>
 
-int linearSearch(int arr[], int n, int target, int *steps) {
-    for (int i = 0; i < n; i++) {
-        (*steps)++;
-        if (arr[i] == target)
-            return i;
-    }
-    return -1;
-}
-
-int binarySearch(int arr[], int n, int target, int *steps) {
+int binarySearch(int arr[], int n, int target) {
     int left = 0, right = n - 1;
+    int steps = 0;
+
     while (left <= right) {
-        (*steps)++;
+        steps++;
         int mid = left + (right - left) / 2;
-        if (arr[mid] == target)
+
+        if (arr[mid] == target) {
+            printf("Element found at index %d\n", mid);
+            printf("Number of steps: %d\n", steps);
             return mid;
+        }
         else if (arr[mid] < target)
             left = mid + 1;
         else
             right = mid - 1;
     }
+
+    printf("Element not found.\n");
+    printf("Number of steps: %d\n", steps);
     return -1;
 }
 
 int main() {
-    int n, target, choice;
-    
+    int n, target;
+
     printf("Enter number of elements: ");
     scanf("%d", &n);
-    
+
     int arr[n];
     printf("Enter %d sorted elements:\n", n);
-    for(int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
         scanf("%d", &arr[i]);
-    
+
     printf("Enter element to search: ");
     scanf("%d", &target);
 
-    printf("\nChoose Search Method:\n");
-    printf("1. Linear Search\n");
-    printf("2. Binary Search\n");
-    printf("Enter choice: ");
-    scanf("%d", &choice);
+    binarySearch(arr, n, target);
 
-    int index = -1, steps = 0;
+    printf("\nTime Complexity:\n");
+    printf("Best Case: O(1)\n");
+    printf("Worst Case: O(log n)\n");
 
-    if(choice == 1) {
-        index = linearSearch(arr, n, target, &steps);
-        if(index != -1)
-            printf("Element found at index %d using Linear Search.\n", index);
-        else
-            printf("Element not found using Linear Search.\n");
-        printf("Number of steps: %d\n", steps);
-    }
-    else if(choice == 2) {
-        index = binarySearch(arr, n, target, &steps);
-        if(index != -1)
-            printf("Element found at index %d using Binary Search.\n", index);
-        else
-            printf("Element not found using Binary Search.\n");
-        printf("Number of steps: %d\n", steps);
-    }
-    else {
-        printf("Invalid choice.\n");
-    }
+    printf("\nSpace Complexity:\n");
+    printf("O(1)\n");
 
     return 0;
 }
